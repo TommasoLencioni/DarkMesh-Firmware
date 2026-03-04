@@ -7,10 +7,8 @@
 #include "NodeDB.h"
 #include "configuration.h"
 #include "graphics/Screen.h"
-#include "Power.h"
 
 ConsoleModule *consoleModule;
-extern Power *power;
 
 void ConsoleModule::sendText(NodeNum dest, ChannelIndex channel, const char *message, bool wantReplies) {
     meshtastic_MeshPacket *p = router->allocForSending();
@@ -189,8 +187,8 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp) {
                 return ProcessMessage::CONTINUE;
             }
 
-            uint16_t voltage = power->getLastVoltageRead();
-            uint8_t battPercent = power->getLastBattPercentRead();
+            uint16_t voltage = Power::getLastVoltageRead();
+            uint8_t battPercent = Power::getLastBattPercentRead();
 
             //FIXME these params seem to be not evaluated correctly
             //eg. when the device is charging, it does not show as charging
