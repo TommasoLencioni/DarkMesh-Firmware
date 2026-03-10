@@ -25,8 +25,13 @@
 #include "input/LinuxInputImpl.h"
 #endif
 
+//POWERPATCH
 #define ABSOLUTE_SHUTDOWN_MV 3400
-#define ABSOLUTE_SHUTDOWN_COUNT 3 
+#define ABSOLUTE_SHUTDOWN_COUNT 3
+
+//CHG
+#define CHARGE_VOLTAGE_HYSTERESIS_MV 5
+#define CHARGE_ITERATIONS_MAX 5
 
 // Working USB detection for powered/charging states on the RAK platform
 #ifdef NRF_APM
@@ -141,6 +146,9 @@ XPowersPPM *PPM = NULL;
 #ifdef HAS_PMU
 XPowersLibInterface *PMU = NULL;
 #else
+
+static uint16_t charge_last_voltage_read = 0;
+static uint8_t charge_read_counter = 255;
 
 // Copy of the base class defined in axp20x.h.
 // I'd rather not include axp20x.h as it brings Wire dependency.
@@ -802,6 +810,18 @@ uint16_t Power::getLastVoltageRead() {
 }
 
 bool Power::isBatteryCharging() {
+    if (charge_last_voltage_read == 0) return false;
+
+    const auto currentRead = getLastVoltageRead();
+    LOG_DEBUG("CHG: current reading mV %d last voltage mV %d", currentRead, charge_last_voltage_read);
+
+    if (getLastBattPercentRead() >= 95) {
+        return true;
+    }
+
+    if (currentRead >= charge_last_voltage_read + CHARGE_VOLTAGE_HYSTERESIS_MV){
+        return true;
+    }
     return batteryLevel ? batteryLevel->isCharging() : false;
 }
 
@@ -861,6 +881,15 @@ void Power::readPowerStatus()
 
         if (hasBattery) {
             batteryVoltageMv = batteryLevel->getBattVoltage();
+
+            if (charge_read_counter >= CHARGE_ITERATIONS_MAX) {
+                charge_last_voltage_read = batteryLevel->getBattVoltage();
+                charge_read_counter = 0;
+                LOG_DEBUG("CHG: resetting last voltage read counter..");
+            }
+
+            charge_read_counter++;
+
             // If the AXP192 returns a valid battery percentage, use it
             if (batteryLevel->getBatteryPercent() >= 0) {
                 batteryChargePercent = batteryLevel->getBatteryPercent();

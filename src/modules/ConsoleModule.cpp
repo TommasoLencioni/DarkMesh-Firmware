@@ -193,14 +193,14 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp) {
             //FIXME these params seem to be not evaluated correctly
             //eg. when the device is charging, it does not show as charging
 
-            //bool charging = power->isBatteryCharging();
+            bool charging = power->isBatteryCharging();
             //bool usbPowered = power->isUsbPowered();
             //bool batteryConnected = power->isBatteryConnect();
 
             msg += vformat("VLT: %u mV\n", voltage);
             msg += vformat("PRC: %u%%\n", battPercent);
 
-            //msg += vformat("CHG: %s\n", charging ? "Y" : "N");
+            msg += vformat("CHG: %s\n", charging ? "Y" : "N");
             //msg += vformat("USB PWR: %s\n", usbPowered ? "Y" : "N");
             //msg += vformat("BATT CONN: %s\n", batteryConnected ? "Y" : "N");
 
