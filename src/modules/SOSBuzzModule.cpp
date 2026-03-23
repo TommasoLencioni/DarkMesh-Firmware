@@ -8,7 +8,7 @@ int32_t SOSBuzzModule::runOnce() {
 
     if (!active) {
         digitalWrite(SOS_BUZZ_PIN, LOW);
-        return 1000;
+        return INT32_MAX;
     }
 
     if (millis() < nextChange) {
@@ -33,6 +33,8 @@ void SOSBuzzModule::start() {
     active = true;
     index = 0;
     nextChange = millis();
+    digitalWrite(SOS_BUZZ_PIN, LOW);
+    setIntervalFromNow(0);
 }
 
 void SOSBuzzModule::stop() {
