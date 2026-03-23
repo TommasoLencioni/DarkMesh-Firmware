@@ -1,4 +1,5 @@
 #include "ConsoleModule.h"
+#include "SOSBuzzModule.h"
 #include "MeshService.h"
 #include "MeshModule.h"
 #include "Telemetry/EnvironmentTelemetry.h"
@@ -52,7 +53,10 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp) {
 
     if (strncmp(reinterpret_cast<const char *>(p.payload.bytes), "+++", 3) == 0) {
         command_state = !command_state;
+        auto msg = vformat("Cmd state: %s", command_state ? "on" : "off");
+        sendText(mp.from, 0, msg.c_str(), false);
     }
+
     if (!command_state) return ProcessMessage::CONTINUE;
 
     if (p.payload.size > 0 and p.payload.bytes[0] == 'H') {
@@ -193,7 +197,7 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp) {
             //FIXME these params seem to be not evaluated correctly
             //eg. when the device is charging, it does not show as charging
 
-            bool charging = power->isBatteryCharging();
+            bool charging = Power::isBatteryCharging();
             //bool usbPowered = power->isUsbPowered();
             //bool batteryConnected = power->isBatteryConnect();
 
@@ -263,6 +267,32 @@ ProcessMessage ConsoleModule::handleReceived(const meshtastic_MeshPacket &mp) {
         }
 
         sendText(mp.from, 0, msg.c_str(), false);
+
+    } else if (p.payload.size == 2 and p.payload.bytes[0] == 'E') {
+        //emergency block, E stands for emergency
+
+#ifdef SOS_BUZZ_PIN
+
+        if (p.payload.bytes[1] == '!') {
+            LOG_INFO("SOS Buzz requested now!");
+
+            auto msg = "Starting SOS Buzzing!";
+            sendText(mp.from, 0, msg, false);
+            //start emitting sos buzz
+            sosBuzzModule->start();
+
+        } else if (p.payload.bytes[1] == '?') {
+
+            sosBuzzModule->stop();
+            auto msg = "Stopped SOS buzzing!";
+            sendText(mp.from, 0, msg, false);
+
+        } else {
+            LOG_INFO("Unrecognized Emergency command");
+        }
+#else
+        sendText(mp.from, 0, "Current board does not support SOS Buzzing", false);
+#endif
     }
 
     return ProcessMessage::CONTINUE; // Let others look at this message also if they want

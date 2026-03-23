@@ -1,5 +1,6 @@
 #include "configuration.h"
 #include "ConsoleModule.h"
+#include "SOSBuzzModule.h"
 #include "ZeroCostHopModule.h"
 #if !MESHTASTIC_EXCLUDE_INPUTBROKER
 #include "buzz/BuzzerFeedbackThread.h"
@@ -135,6 +136,11 @@ void setupModules()
 #endif
 #if !MESHTASTIC_EXCLUDE_TEXTMESSAGE
     textMessageModule = new TextMessageModule();
+#endif
+
+//dont place it after console module!
+#ifdef SOS_BUZZ_PIN
+    sosBuzzModule = new SOSBuzzModule();
 #endif
 
 #if DM_CONSOLE_MODULE
