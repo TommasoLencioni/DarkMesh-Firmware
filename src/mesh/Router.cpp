@@ -580,7 +580,9 @@ DecodeState perhapsDecode(meshtastic_MeshPacket *p)
 
                     memcpy(p->decoded.payload.bytes, decompressed_out, (size_t)decompressed_len);
                     p->decoded.payload.size = (size_t)decompressed_len;
-                    p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_APP;
+
+                    //we dont want to assign compresed messages as text, we want to detect them app-wise
+                    //p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_APP;
 
                     LOG_DEBUG("Decompressed message - %.*s",
                               decompressed_len,
