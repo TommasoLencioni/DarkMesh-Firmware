@@ -624,52 +624,51 @@ meshtastic_Routing_Error perhapsEncode(meshtastic_MeshPacket *p)
             p->decoded.has_bitfield = true;
             p->decoded.bitfield |= (config.lora.config_ok_to_mqtt << BITFIELD_OK_TO_MQTT_SHIFT);
             p->decoded.bitfield |= (p->decoded.want_response << BITFIELD_WANT_RESPONSE_SHIFT);
-        }
 
 #ifdef DM_USE_MESSAGE_COMPRESSION
-        if (p->decoded.portnum == meshtastic_PortNum_TEXT_MESSAGE_COMPRESSED_APP) {
+            if (p->decoded.portnum == meshtastic_PortNum_TEXT_MESSAGE_COMPRESSED_APP) {
 
-            const size_t payload_len = p->decoded.payload.size;
+                const size_t payload_len = p->decoded.payload.size;
 
-            // sanity check
-            if (payload_len == 0 || payload_len > meshtastic_Constants_DATA_PAYLOAD_LEN) {
-                LOG_WARN("Invalid payload length for compression: %u", (unsigned)payload_len);
-                p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_APP;
-            } else {
-                uint8_t original_payload[meshtastic_Constants_DATA_PAYLOAD_LEN] = {0};
-                uint8_t compressed_out[meshtastic_Constants_DATA_PAYLOAD_LEN] = {0};
-
-                memcpy(original_payload, p->decoded.payload.bytes, payload_len);
-
-                int compressed_len = unishox2_compress_simple(
-                    (const char *)original_payload,
-                    (int)payload_len,
-                    (char *)compressed_out
-                );
-
-                LOG_DEBUG("Original length - %u", (unsigned)payload_len);
-                LOG_DEBUG("Compressed length - %d", compressed_len);
-                LOG_DEBUG("Original message - %.*s", (int)payload_len, (const char *)original_payload);
-
-                // compression failed or not worth it
-                if (compressed_len <= 0 || compressed_len >= (int)payload_len) {
-                    LOG_DEBUG("Not using compressed message");
+                // sanity check
+                if (payload_len == 0 || payload_len > meshtastic_Constants_DATA_PAYLOAD_LEN) {
+                    LOG_WARN("Invalid payload length for compression: %u", (unsigned)payload_len);
                     p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_APP;
                 } else {
-                    LOG_DEBUG("Using compressed message");
+                    uint8_t original_payload[meshtastic_Constants_DATA_PAYLOAD_LEN] = {0};
+                    uint8_t compressed_out[meshtastic_Constants_DATA_PAYLOAD_LEN] = {0};
 
-                    memcpy(p->decoded.payload.bytes, compressed_out, (size_t)compressed_len);
-                    p->decoded.payload.size = (size_t)compressed_len;
-                    p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_COMPRESSED_APP;
+                    memcpy(original_payload, p->decoded.payload.bytes, payload_len);
+
+                    int compressed_len = unishox2_compress_simple(
+                        (const char *)original_payload,
+                        (int)payload_len,
+                        (char *)compressed_out
+                    );
+
+                    LOG_DEBUG("Original length - %u", (unsigned)payload_len);
+                    LOG_DEBUG("Compressed length - %d", compressed_len);
+                    LOG_DEBUG("Original message - %.*s", (int)payload_len, (const char *)original_payload);
+
+                    // compression failed or not worth it
+                    if (compressed_len <= 0 || compressed_len >= (int)payload_len) {
+                        LOG_DEBUG("Not using compressed message");
+                        p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_APP;
+                    } else {
+                        LOG_DEBUG("Using compressed message");
+
+                        memcpy(p->decoded.payload.bytes, compressed_out, (size_t)compressed_len);
+                        p->decoded.payload.size = (size_t)compressed_len;
+                        p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_COMPRESSED_APP;
+                    }
                 }
             }
-        }
 #else
-        if (p->decoded.portnum == meshtastic_PortNum_TEXT_MESSAGE_COMPRESSED_APP) {
-            p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_APP;
-        }
+            if (p->decoded.portnum == meshtastic_PortNum_TEXT_MESSAGE_COMPRESSED_APP) {
+                p->decoded.portnum = meshtastic_PortNum_TEXT_MESSAGE_APP;
+            }
 #endif
-
+        }
 
         size_t numbytes = pb_encode_to_bytes(bytes, sizeof(bytes), &meshtastic_Data_msg, &p->decoded);
 
