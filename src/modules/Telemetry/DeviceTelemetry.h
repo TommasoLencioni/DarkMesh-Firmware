@@ -25,6 +25,15 @@ class DeviceTelemetryModule : private concurrency::OSThread,
     }
     virtual bool wantUIFrame() { return false; }
 
+
+    meshtastic_Telemetry extGetDeviceTelemetry() {
+        return getDeviceTelemetry();
+    }
+
+    meshtastic_Telemetry extGetDeviceLocalStats() {
+        return getLocalStatsTelemetry();
+    }
+
   protected:
     /** Called to handle a particular incoming message
     @return true if you've guaranteed you've handled this message and no other handlers should be considered for it

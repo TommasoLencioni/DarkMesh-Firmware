@@ -30,6 +30,14 @@
 #include "input/LinuxInputImpl.h"
 #endif
 
+//POWERPATCH
+#define ABSOLUTE_SHUTDOWN_MV 3400
+#define ABSOLUTE_SHUTDOWN_COUNT 3
+
+//CHG
+#define CHARGE_VOLTAGE_HYSTERESIS_MV 5
+#define CHARGE_ITERATIONS_MAX 5
+
 // Working USB detection for powered/charging states on the RAK platform
 #ifdef NRF_APM
 #include "nrfx_power.h"
@@ -173,6 +181,9 @@ class HasBatteryLevel
     virtual bool isCharging() { return false; }
 };
 #endif
+
+static uint16_t charge_last_voltage_read = 0;
+static uint8_t charge_read_counter = 255;
 
 bool pmu_irq = false;
 
@@ -840,6 +851,38 @@ void Power::shutdown()
 #endif
 }
 
+uint16_t Power::getLastVoltageRead() {
+    return batteryLevel ? batteryLevel->getBattVoltage() : 0;
+}
+
+bool Power::isBatteryCharging() {
+    if (charge_last_voltage_read == 0) return false;
+
+    const auto currentRead = getLastVoltageRead();
+    LOG_DEBUG("CHG: current reading mV %d last voltage mV %d", currentRead, charge_last_voltage_read);
+
+    if (getLastBattPercentRead() >= 95) {
+        return true;
+    }
+
+    if (currentRead >= charge_last_voltage_read + CHARGE_VOLTAGE_HYSTERESIS_MV){
+        return true;
+    }
+    return batteryLevel ? batteryLevel->isCharging() : false;
+}
+
+bool Power::isUsbPowered() {
+    return batteryLevel ? batteryLevel->isVbusIn() : false;
+}
+
+bool Power::isBatteryConnect() {
+    return batteryLevel ? batteryLevel->isBatteryConnect() : false;
+}
+
+uint8_t Power::getLastBattPercentRead() {
+    return batteryLevel ? batteryLevel->getBatteryPercent() : 0;
+}
+
 /// Reads power status to powerStatus singleton.
 //
 // TODO(girts): move this and other axp stuff to power.h/power.cpp.
@@ -858,8 +901,44 @@ void Power::readPowerStatus()
         usbPowered = batteryLevel->isVbusIn() ? OptTrue : OptFalse;
         isChargingNow = batteryLevel->isCharging() ? OptTrue : OptFalse;
 #endif
+
+#ifdef FORCE_SHUTDOWN_LOWPOWER
+        static uint8_t absolute_shutdown_counter = 0;
+        batteryVoltageMv = batteryLevel->getBattVoltage();
+        LOG_DEBUG("BATTERY VOLTAGE mV %d", batteryVoltageMv);
+
+        if (batteryVoltageMv > 0 && batteryVoltageMv <= ABSOLUTE_SHUTDOWN_MV) {
+
+            absolute_shutdown_counter++;
+
+            LOG_ERROR("ABSOLUTE POWER CUTOFF: %d mV (%u/%u)",
+                    batteryVoltageMv,
+                    absolute_shutdown_counter,
+                    ABSOLUTE_SHUTDOWN_COUNT);
+
+            if (absolute_shutdown_counter >= ABSOLUTE_SHUTDOWN_COUNT) {
+                LOG_ERROR("Voltage too low, forcing shutdown NOW");
+                absolute_shutdown_counter = ABSOLUTE_SHUTDOWN_COUNT;
+                shutdown();
+                return;
+            }
+
+        } else {
+            absolute_shutdown_counter = 0;
+        }
+#endif
+
         if (hasBattery) {
             batteryVoltageMv = batteryLevel->getBattVoltage();
+
+            if (charge_read_counter >= CHARGE_ITERATIONS_MAX) {
+                charge_last_voltage_read = batteryLevel->getBattVoltage();
+                charge_read_counter = 0;
+                LOG_DEBUG("CHG: resetting last voltage read counter..");
+            }
+
+            charge_read_counter++;
+
             // If the AXP192 returns a valid battery percentage, use it
             if (batteryLevel->getBatteryPercent() >= 0) {
                 batteryChargePercent = batteryLevel->getBatteryPercent();
@@ -959,6 +1038,7 @@ void Power::readPowerStatus()
     // is 2.0 to 2.5V, current OCV min is set to 3100 that is large enough.
     //
 
+#ifndef FORCE_SHUTDOWN_LOWPOWER
     if (batteryLevel && powerStatus2.getHasBattery() && !powerStatus2.getHasUSB()) {
         if (batteryLevel->getBattVoltage() < OCV[NUM_OCV_POINTS - 1]) {
             low_voltage_counter++;
@@ -971,6 +1051,7 @@ void Power::readPowerStatus()
             low_voltage_counter = 0;
         }
     }
+#endif
 }
 
 int32_t Power::runOnce()
