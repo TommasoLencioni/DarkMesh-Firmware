@@ -301,6 +301,7 @@ ErrorCode Router::send(meshtastic_MeshPacket *p)
         return meshtastic_Routing_Error_BAD_REQUEST;
     } // should have already been handled by sendLocal
 
+#ifndef SKIP_OVERRIDE_DUTYCYCLE
     // Abort sending if we are violating the duty cycle
     if (!config.lora.override_duty_cycle && myRegion->dutyCycle < 100) {
         float hourlyTxPercent = airTime->utilizationTXPercent();
@@ -326,6 +327,7 @@ ErrorCode Router::send(meshtastic_MeshPacket *p)
             return err;
         }
     }
+#endif
 
     // PacketId nakId = p->decoded.which_ackVariant == SubPacket_fail_id_tag ? p->decoded.ackVariant.fail_id : 0;
     // assert(!nakId); // I don't think we ever send 0hop naks over the wire (other than to the phone), test that assumption with
