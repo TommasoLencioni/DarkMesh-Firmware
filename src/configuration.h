@@ -481,6 +481,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Global switches to turn off features for a minimized build
 // -----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
+// DARKMESH SWITCHES
+// -----------------------------------------------------------------------------
+//#define SKIP_GPS_INIT 1
+//#define SKIP_OVERRIDE_DUTYCYCLE 1
+#define FORCE_SHUTDOWN_LOWPOWER 1
+//#define STEALTH_MODE 1
+#define DM_CONSOLE_MODULE 1
+#define DM_ZERO_COST_HOP_MODULE 1
+#define DM_USE_MESSAGE_COMPRESSION 1
+
 // #define MESHTASTIC_MINIMIZE_BUILD 1
 #ifdef MESHTASTIC_MINIMIZE_BUILD
 #define MESHTASTIC_EXCLUDE_MODULES 1
