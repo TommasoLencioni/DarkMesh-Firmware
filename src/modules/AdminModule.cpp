@@ -1195,6 +1195,12 @@ void AdminModule::handleGetModuleConfig(const meshtastic_MeshPacket &req, const 
             res.get_module_config_response.which_payload_variant = meshtastic_ModuleConfig_statusmessage_tag;
             res.get_module_config_response.payload_variant.statusmessage = moduleConfig.statusmessage;
             break;
+
+        case meshtastic_AdminMessage_ModuleConfigType_TRAFFICMANAGEMENT_CONFIG:
+            LOG_INFO("Get module config: Traffic Management");
+            res.get_module_config_response.which_payload_variant = meshtastic_ModuleConfig_traffic_management_tag;
+            res.get_module_config_response.payload_variant.traffic_management = moduleConfig.traffic_management;
+            break;
         }
 
         // NOTE: The phone app needs to know the ls_secsvalue so it can properly expect sleep behavior.
