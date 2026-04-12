@@ -1010,6 +1010,12 @@ bool AdminModule::handleSetModuleConfig(const meshtastic_ModuleConfig &c)
         moduleConfig.statusmessage = c.payload_variant.statusmessage;
         shouldReboot = false;
         break;
+
+    case meshtastic_ModuleConfig_traffic_management_tag:
+        LOG_INFO("Set module config: Traffic Management");
+        moduleConfig.has_traffic_management = true;
+        moduleConfig.traffic_management = c.payload_variant.traffic_management;
+        break;
     }
     saveChanges(SEGMENT_MODULECONFIG, shouldReboot);
     return true;
