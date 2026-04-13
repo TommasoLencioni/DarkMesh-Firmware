@@ -1,0 +1,37 @@
+name: Build DarkMesh Firmware
+
+on:
+  workflow_dispatch:
+    inputs:
+      board:
+        description: 'Board to build'
+        required: true
+        type: choice
+        options:
+          - heltec-v3
+        default: heltec-v3
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build ${{ inputs.board }}
+        uses: ./.github/actions/build-variant
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          board: ${{ inputs.board }}
+          remove-debug-flags: ./arch/esp32/esp32s3.ini
+          build-script-path: bin/build-esp32.sh
+          ota-firmware-source: firmware.bin
+          ota-firmware-target: release/bleota.bin
+          artifact-paths: |
+            release/*.bin
+            release/*.elf
+          include-web-ui: false
+          arch: esp32s3
