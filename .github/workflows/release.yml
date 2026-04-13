@@ -19,11 +19,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate build matrix
+      - name: Generate DarkMesh build matrix
         id: gen-matrix
         run: |
-          ESP32S3_BOARDS=$(./bin/generate_ci_matrix.py esp32s3)
-          NRF52_BOARDS=$(./bin/generate_ci_matrix.py nrf52840)
+          # DarkMesh whitelist - only build these specific boards
+          ESP32S3_BOARDS='["heltec-v3", "heltec-wsl-v3"]'
+          NRF52_BOARDS='["rak4631"]'
+
           echo "esp32s3=$(jq -cn --argjson boards "$ESP32S3_BOARDS" '{board: $boards}')" >> $GITHUB_OUTPUT
           echo "nrf52840=$(jq -cn --argjson boards "$NRF52_BOARDS" '{board: $boards}')" >> $GITHUB_OUTPUT
           echo "ESP32-S3 boards: $ESP32S3_BOARDS"
