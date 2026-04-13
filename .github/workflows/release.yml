@@ -15,7 +15,23 @@ permissions:
   contents: write
 
 jobs:
+  create-tag:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a v${{ inputs.version }} -m "Release v${{ inputs.version }}"
+          git push origin v${{ inputs.version }}
+
   build-matrix:
+    if: always() && !cancelled()
+    needs: [create-tag]
     strategy:
       fail-fast: false
       matrix:
@@ -105,17 +121,19 @@ jobs:
         with:
           python-version: 3.x
 
-      - name: Get version
+      - name: Get version from tag
         id: version
         run: |
-          echo "long=$(./bin/buildinfo.py long)" >> $GITHUB_OUTPUT
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "tag=v${{ inputs.version }}" >> $GITHUB_OUTPUT
-            echo "name=DarkMesh Firmware ${{ inputs.version }}" >> $GITHUB_OUTPUT
+            TAG_NAME="v${{ inputs.version }}"
+            VERSION="${{ inputs.version }}"
           else
-            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-            echo "name=DarkMesh Firmware ${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+            TAG_NAME="${GITHUB_REF#refs/tags/}"
+            VERSION="${GITHUB_REF#refs/tags/v}"
           fi
+          echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "name=DarkMesh Firmware ${VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
