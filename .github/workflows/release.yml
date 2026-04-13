@@ -113,6 +113,17 @@ jobs:
       - name: Display artifacts
         run: ls -R ./artifacts
 
+      - name: Create board-specific zips
+        run: |
+          mkdir -p ./release-zips
+          for board_dir in ./artifacts/*/; do
+            board_name=$(basename "$board_dir")
+            cd "$board_dir"
+            zip -r "../../release-zips/${board_name}.zip" *.bin *.uf2 2>/dev/null || true
+            cd - > /dev/null
+          done
+          ls -lh ./release-zips/
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -121,6 +132,4 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-          files: |
-            ./artifacts/**/*.bin
-            ./artifacts/**/*.uf2
+          files: ./release-zips/*.zip
