@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkMesh Firmware Downloads</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #58a6ff;
+            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #8b949e;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .selector {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c9d1d9;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select:hover {
+            border-color: #58a6ff;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+
+        select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .download-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #30363d;
+        }
+
+        .file-list {
+            display: none;
+        }
+
+        .file-list.visible {
+            display: block;
+        }
+
+        .file-item {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s;
+        }
+
+        .file-item:hover {
+            border-color: #58a6ff;
+        }
+
+        .file-name {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .download-btn {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            background: #2ea043;
+        }
+
+        .loading {
+            text-align: center;
+            color: #8b949e;
+            padding: 20px;
+        }
+
+        .error {
+            background: #f85149;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.visible {
+            display: block;
+        }
+
+        .no-files {
+            text-align: center;
+            color: #8b949e;
+            padding: 30px;
+            display: none;
+        }
+
+        .no-files.visible {
+            display: block;
+        }
+
+        .info-box {
+            background: #1f6feb;
+            border: 1px solid #58a6ff;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #c9d1d9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌑 DarkMesh Firmware</h1>
+        <p class="subtitle">Download firmware builds for your device</p>
+
+        <div class="info-box" id="infoBox" style="display: none;">
+            <strong>ℹ️ Note:</strong> Select a firmware version and your device model to download.
+        </div>
+
+        <div class="error" id="errorBox"></div>
+
+        <div class="selector">
+            <label for="versionSelect">Firmware Version</label>
+            <select id="versionSelect">
+                <option value="">Loading versions...</option>
+            </select>
+        </div>
+
+        <div class="selector">
+            <label for="deviceSelect">Device Model</label>
+            <select id="deviceSelect" disabled>
+                <option value="">Select a version first</option>
+            </select>
+        </div>
+
+        <div class="download-section">
+            <div class="loading" id="loadingMsg">Select a version and device to see available downloads</div>
+            <div class="no-files" id="noFilesMsg">No firmware files found for this combination</div>
+            <div class="file-list" id="fileList"></div>
+        </div>
+    </div>
+
+    <script>
+        const REPO_OWNER = 'TommasoLencioni';
+        const REPO_NAME = 'DarkMesh-Firmware';
+        const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases`;
+
+        let releases = [];
+        let currentRelease = null;
+
+        // Device mappings
+        const DEVICES = {
+            'heltec-v3': 'Heltec WiFi LoRa 32 V3',
+            'heltec-wsl-v3': 'Heltec Wireless Stick Lite V3',
+            'rak4631': 'RAK4631 WisBlock Core'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadReleases();
+            setupEventListeners();
+        });
+
+        async function loadReleases() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Failed to fetch releases');
+
+                releases = await response.json();
+
+                if (releases.length === 0) {
+                    showError('No releases found. Please create a release first.');
+                    return;
+                }
+
+                populateVersionSelect();
+                document.getElementById('infoBox').style.display = 'block';
+            } catch (error) {
+                showError(`Error loading releases: ${error.message}`);
+            }
+        }
+
+        function populateVersionSelect() {
+            const select = document.getElementById('versionSelect');
+            select.innerHTML = '<option value="">-- Select Version --</option>';
+
+            releases.forEach((release, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = release.name || release.tag_name;
+                if (release.prerelease) option.textContent += ' (Pre-release)';
+                select.appendChild(option);
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('versionSelect').addEventListener('change', onVersionChange);
+            document.getElementById('deviceSelect').addEventListener('change', onDeviceChange);
+        }
+
+        function onVersionChange(e) {
+            const index = e.target.value;
+            const deviceSelect = document.getElementById('deviceSelect');
+
+            if (!index) {
+                deviceSelect.disabled = true;
+                deviceSelect.innerHTML = '<option value="">Select a version first</option>';
+                hideFiles();
+                return;
+            }
+
+            currentRelease = releases[index];
+            populateDeviceSelect();
+            deviceSelect.disabled = false;
+        }
+
+        function populateDeviceSelect() {
+            const select = document.getElementById('deviceSelect');
+            select.innerHTML = '<option value="">-- Select Device --</option>';
+
+            Object.entries(DEVICES).forEach(([key, name]) => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+        }
+
+        function onDeviceChange(e) {
+            const device = e.target.value;
+
+            if (!device || !currentRelease) {
+                hideFiles();
+                return;
+            }
+
+            displayFiles(device);
+        }
+
+        function displayFiles(device) {
+            const fileList = document.getElementById('fileList');
+            const noFilesMsg = document.getElementById('noFilesMsg');
+            const loadingMsg = document.getElementById('loadingMsg');
+
+            // Find matching asset
+            const assets = currentRelease.assets.filter(asset =>
+                asset.name.includes(device)
+            );
+
+            loadingMsg.style.display = 'none';
+
+            if (assets.length === 0) {
+                fileList.classList.remove('visible');
+                noFilesMsg.classList.add('visible');
+                return;
+            }
+
+            noFilesMsg.classList.remove('visible');
+            fileList.innerHTML = '';
+
+            assets.forEach(asset => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+
+                const fileName = document.createElement('div');
+                fileName.className = 'file-name';
+                fileName.textContent = asset.name;
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = asset.browser_download_url;
+                downloadLink.className = 'download-btn';
+                downloadLink.textContent = 'Download';
+                downloadLink.download = asset.name;
+
+                fileItem.appendChild(fileName);
+                fileItem.appendChild(downloadLink);
+                fileList.appendChild(fileItem);
+            });
+
+            fileList.classList.add('visible');
+        }
+
+        function hideFiles() {
+            document.getElementById('fileList').classList.remove('visible');
+            document.getElementById('noFilesMsg').classList.remove('visible');
+            document.getElementById('loadingMsg').style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById('errorBox');
+            errorBox.textContent = message;
+            errorBox.classList.add('visible');
+        }
+    </script>
+</body>
+</html>
