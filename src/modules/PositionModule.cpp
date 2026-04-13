@@ -74,6 +74,7 @@ bool PositionModule::handleReceivedProtobuf(const meshtastic_MeshPacket &mp, mes
 
             nodeDB->setLocalPosition(p, true);
             return false;
+            }
         } else {
             LOG_DEBUG("Incoming update from MYSELF");
             nodeDB->setLocalPosition(p);
