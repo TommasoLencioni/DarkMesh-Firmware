@@ -180,28 +180,28 @@
         <h1>🌑 DarkMesh Firmware</h1>
         <p class="subtitle">Download firmware builds for your device</p>
 
-        <div class="info-box" id="infoBox" style="display: none;">
-            <strong>ℹ️ Note:</strong> Select a firmware version and your device model to download.
+        <div class="info-box" id="infoBox">
+            <strong>ℹ️ Note:</strong> Select your device model first, then choose the firmware version.
         </div>
 
         <div class="error" id="errorBox"></div>
 
         <div class="selector">
-            <label for="versionSelect">Firmware Version</label>
-            <select id="versionSelect">
-                <option value="">Loading versions...</option>
+            <label for="deviceSelect">Device Model</label>
+            <select id="deviceSelect">
+                <option value="">-- Select Device --</option>
             </select>
         </div>
 
         <div class="selector">
-            <label for="deviceSelect">Device Model</label>
-            <select id="deviceSelect" disabled>
-                <option value="">Select a version first</option>
+            <label for="versionSelect">Firmware Version</label>
+            <select id="versionSelect" disabled>
+                <option value="">Select a device first</option>
             </select>
         </div>
 
         <div class="download-section">
-            <div class="loading" id="loadingMsg">Select a version and device to see available downloads</div>
+            <div class="loading" id="loadingMsg">Select a device and version to see available downloads</div>
             <div class="no-files" id="noFilesMsg">No firmware files found for this combination</div>
             <div class="file-list" id="fileList"></div>
         </div>
@@ -213,6 +213,7 @@
         const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases`;
 
         let releases = [];
+        let currentDevice = null;
         let currentRelease = null;
 
         // Device mappings
@@ -225,6 +226,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             await loadReleases();
+            populateDeviceSelect();
             setupEventListeners();
         });
 
@@ -239,46 +241,9 @@
                     showError('No releases found. Please create a release first.');
                     return;
                 }
-
-                populateVersionSelect();
-                document.getElementById('infoBox').style.display = 'block';
             } catch (error) {
                 showError(`Error loading releases: ${error.message}`);
             }
-        }
-
-        function populateVersionSelect() {
-            const select = document.getElementById('versionSelect');
-            select.innerHTML = '<option value="">-- Select Version --</option>';
-
-            releases.forEach((release, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = release.name || release.tag_name;
-                if (release.prerelease) option.textContent += ' (Pre-release)';
-                select.appendChild(option);
-            });
-        }
-
-        function setupEventListeners() {
-            document.getElementById('versionSelect').addEventListener('change', onVersionChange);
-            document.getElementById('deviceSelect').addEventListener('change', onDeviceChange);
-        }
-
-        function onVersionChange(e) {
-            const index = e.target.value;
-            const deviceSelect = document.getElementById('deviceSelect');
-
-            if (!index) {
-                deviceSelect.disabled = true;
-                deviceSelect.innerHTML = '<option value="">Select a version first</option>';
-                hideFiles();
-                return;
-            }
-
-            currentRelease = releases[index];
-            populateDeviceSelect();
-            deviceSelect.disabled = false;
         }
 
         function populateDeviceSelect() {
@@ -293,15 +258,61 @@
             });
         }
 
-        function onDeviceChange(e) {
-            const device = e.target.value;
+        function setupEventListeners() {
+            document.getElementById('deviceSelect').addEventListener('change', onDeviceChange);
+            document.getElementById('versionSelect').addEventListener('change', onVersionChange);
+        }
 
-            if (!device || !currentRelease) {
+        function onDeviceChange(e) {
+            currentDevice = e.target.value;
+            const versionSelect = document.getElementById('versionSelect');
+
+            if (!currentDevice) {
+                versionSelect.disabled = true;
+                versionSelect.innerHTML = '<option value="">Select a device first</option>';
                 hideFiles();
                 return;
             }
 
-            displayFiles(device);
+            populateVersionsForDevice(currentDevice);
+            versionSelect.disabled = false;
+        }
+
+        function populateVersionsForDevice(device) {
+            const select = document.getElementById('versionSelect');
+            select.innerHTML = '<option value="">-- Select Version --</option>';
+
+            // Filter releases that have assets for this device
+            const releasesWithDevice = releases.filter(release =>
+                release.assets.some(asset => asset.name.includes(device))
+            );
+
+            if (releasesWithDevice.length === 0) {
+                select.innerHTML = '<option value="">No releases available for this device</option>';
+                select.disabled = true;
+                hideFiles();
+                return;
+            }
+
+            releasesWithDevice.forEach((release, index) => {
+                const option = document.createElement('option');
+                option.value = releases.indexOf(release); // Use original index
+                option.textContent = release.name || release.tag_name;
+                if (release.prerelease) option.textContent += ' (Pre-release)';
+                select.appendChild(option);
+            });
+        }
+
+        function onVersionChange(e) {
+            const index = e.target.value;
+
+            if (!index || !currentDevice) {
+                hideFiles();
+                return;
+            }
+
+            currentRelease = releases[index];
+            displayFiles(currentDevice);
         }
 
         function displayFiles(device) {
