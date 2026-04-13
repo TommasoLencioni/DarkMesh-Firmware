@@ -10,13 +10,6 @@ on:
         options:
           - heltec-v3
         default: heltec-v3
-  push:
-    branches:
-      - '2.5.20-darkmesh_ghost'
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - '.gitignore'
 
 concurrency:
   group: build-${{ github.head_ref || github.run_id }}
