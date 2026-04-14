@@ -4,68 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DarkMesh Firmware Downloads</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            background: white;
-            color: #333;
+            font-family: 'Roboto Mono', monospace;
+            background-color: #121212;
+            color: #E0E0E0;
+            margin: 0;
+            padding: 0;
             line-height: 1.6;
         }
 
         header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #D32F2F;
             text-align: center;
-            margin-bottom: 40px;
+            padding: 16px 8px;
+            color: white;
+            border-bottom: 2px solid #B71C1C;
         }
 
         header img {
-            max-width: 200px;
-            margin-bottom: 20px;
+            width: 80px;
+            height: auto;
+            display: block;
+            margin: 0;
+            padding: 0;
         }
 
-        h1 {
-            color: #000;
-            font-size: 28px;
+        header h1 {
+            margin: 8px 0 0 0;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 20px 15px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .intro {
+            background-color: #1E1E1E;
+            border: 1px solid #2C2C2C;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .intro h2 {
+            color: #76FF03;
+            margin-top: 0;
             margin-bottom: 10px;
+            font-size: 1.4rem;
         }
 
         .subtitle {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 30px;
+            color: #9E9E9E;
+            font-size: 1rem;
+            margin-bottom: 10px;
         }
 
         .selector {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
             margin-bottom: 8px;
+            color: #76FF03;
             font-weight: bold;
-            color: #000;
         }
 
         select {
             width: 100%;
             padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
+            font-size: 14px;
+            font-family: 'Roboto Mono', monospace;
+            border: 1px solid #2C2C2C;
+            border-radius: 8px;
+            background: #1E1E1E;
+            color: #E0E0E0;
+            cursor: pointer;
+        }
+
+        select:hover {
+            border-color: #76FF03;
         }
 
         select:disabled {
-            opacity: 0.6;
-            background: #f5f5f5;
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .download-section {
-            margin-top: 30px;
+            margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #2C2C2C;
         }
 
         .file-list {
@@ -77,40 +120,47 @@
         }
 
         .file-item {
+            background-color: #1E1E1E;
+            border: 1px solid #2C2C2C;
+            border-radius: 8px;
             padding: 15px;
             margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #fafafa;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .file-item:hover {
+            border-color: #76FF03;
         }
 
         .file-name {
-            font-family: monospace;
+            font-family: 'Roboto Mono', monospace;
             font-size: 14px;
-            color: #333;
+            color: #B0BEC5;
         }
 
         .download-btn {
-            background: #0066cc;
+            background: #2196F3;
             color: white;
             border: none;
             padding: 8px 20px;
-            border-radius: 4px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.25s ease-in-out;
         }
 
         .download-btn:hover {
-            background: #0052a3;
+            background: #1976D2;
+            transform: translateY(-2px);
         }
 
         .loading, .no-files {
             text-align: center;
-            color: #666;
+            color: #9E9E9E;
             padding: 20px;
         }
 
@@ -123,11 +173,10 @@
         }
 
         .error {
-            background: #fee;
-            color: #c00;
+            background: #E53935;
+            color: white;
             padding: 12px;
-            border-radius: 4px;
-            border: 1px solid #fcc;
+            border-radius: 8px;
             margin-bottom: 20px;
             display: none;
         }
@@ -137,48 +186,72 @@
         }
 
         .info-box {
-            background: #e7f3ff;
-            border: 1px solid #b3d9ff;
-            border-radius: 4px;
-            padding: 12px;
+            background-color: #1E1E1E;
+            border-left: 6px solid #2196F3;
+            border-radius: 8px;
+            padding: 15px;
             margin-bottom: 20px;
+            color: #E0E0E0;
+        }
+
+        a {
+            color: #2196F3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.4rem;
+            }
+            .intro {
+                padding: 14px;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <img src="images/dmlogo4.png" alt="DarkMesh Logo">
-        <h1>DarkMesh Firmware Downloads</h1>
-        <p class="subtitle">Select your device and download the firmware</p>
+        <h1>DarkMesh</h1>
     </header>
 
-    <div>
+    <main>
+        <div class="intro">
+            <h2>FIRMWARE DOWNLOADS</h2>
+            <p class="subtitle">Select your device and download the firmware</p>
 
-        <div class="info-box" id="infoBox">
-            <strong>ℹ️ Note:</strong> Select your device model first, then choose the firmware version.
+            <div class="info-box" id="infoBox">
+                <strong>ℹ️ Note:</strong> Select your device model first, then choose the firmware version.
+            </div>
+
+            <div class="error" id="errorBox"></div>
+
+            <div class="selector">
+                <label for="deviceSelect">Device Model</label>
+                <select id="deviceSelect">
+                    <option value="">-- Select Device --</option>
+                </select>
+            </div>
+
+            <div class="selector">
+                <label for="versionSelect">Firmware Version</label>
+                <select id="versionSelect" disabled>
+                    <option value="">Select a device first</option>
+                </select>
+            </div>
+
+            <div class="download-section">
+                <div class="loading" id="loadingMsg">Select a device and version to see available downloads</div>
+                <div class="no-files" id="noFilesMsg">No firmware files found for this combination</div>
+                <div class="file-list" id="fileList"></div>
+            </div>
         </div>
-
-        <div class="error" id="errorBox"></div>
-
-        <div class="selector">
-            <label for="deviceSelect">Device Model</label>
-            <select id="deviceSelect">
-                <option value="">-- Select Device --</option>
-            </select>
-        </div>
-
-        <div class="selector">
-            <label for="versionSelect">Firmware Version</label>
-            <select id="versionSelect" disabled>
-                <option value="">Select a device first</option>
-            </select>
-        </div>
-
-        <div class="download-section">
-            <div class="loading" id="loadingMsg">Select a device and version to see available downloads</div>
-            <div class="no-files" id="noFilesMsg">No firmware files found for this combination</div>
-            <div class="file-list" id="fileList"></div>
-        </div>
+    </main>
 
     <script>
         const REPO_OWNER = 'TommasoLencioni';
