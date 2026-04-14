@@ -1,398 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkMesh Firmware Downloads</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-            background: #0d1117;
-            color: #c9d1d9;
-            line-height: 1.5;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 30px;
-        }
-
-        h1 {
-            color: #58a6ff;
-            margin-bottom: 10px;
-            font-size: 32px;
-            font-weight: 600;
-        }
-
-        .subtitle {
-            color: #8b949e;
-            margin-bottom: 30px;
-            font-size: 16px;
-        }
-
-        .selector {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #c9d1d9;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px 12px;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            color: #c9d1d9;
-            font-size: 14px;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-
-        select:hover {
-            border-color: #58a6ff;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
-        }
-
-        select:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .download-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #30363d;
-        }
-
-        .file-list {
-            display: none;
-        }
-
-        .file-list.visible {
-            display: block;
-        }
-
-        .file-item {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: border-color 0.2s;
-        }
-
-        .file-item:hover {
-            border-color: #58a6ff;
-        }
-
-        .file-name {
-            font-family: 'Consolas', 'Monaco', monospace;
-            color: #c9d1d9;
-            font-size: 14px;
-        }
-
-        .download-btn {
-            background: #238636;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .download-btn:hover {
-            background: #2ea043;
-        }
-
-        .loading {
-            text-align: center;
-            color: #8b949e;
-            padding: 20px;
-        }
-
-        .error {
-            background: #f85149;
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .error.visible {
-            display: block;
-        }
-
-        .no-files {
-            text-align: center;
-            color: #8b949e;
-            padding: 30px;
-            display: none;
-        }
-
-        .no-files.visible {
-            display: block;
-        }
-
-        .info-box {
-            background: #1f6feb;
-            border: 1px solid #58a6ff;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #c9d1d9;
-        }
-    </style>
+    <title>DarkMesh Network</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>🌑 DarkMesh Firmware</h1>
-        <p class="subtitle">Download firmware builds for your device</p>
+        <header>
+            <img src="images/dmlogo4.png" alt="DarkMesh Logo">
+            <h1>DarkMesh</h1>
+        </header>
 
-        <div class="info-box" id="infoBox">
-            <strong>ℹ️ Note:</strong> Select your device model first, then choose the firmware version.
+        <div class="warning">
+            <strong>⚠️ DISCLAIMER</strong><br>
+            Questo progetto non offre alcuna garanzia di funzionamento. L'utente si assume ogni responsabilità derivante dall'uso del firmware e delle applicazioni, inclusi eventuali danni a dispositivi o perdita di dati. Si raccomanda di utilizzare il firmware solo su hardware di cui si è disposti a correre il rischio.
         </div>
 
-        <div class="error" id="errorBox"></div>
+        <section>
+            <h2>🔗 NO SUPPORT POLICY</h2>
+            <p>
+                Non viene fornito supporto tecnico o assistenza per problemi di configurazione, installazione o utilizzo.
+                Gli utenti sono invitati a consultare la documentazione disponibile e le discussioni su GitHub Issues per eventuali dubbi o domande.
+            </p>
+        </section>
 
-        <div class="selector">
-            <label for="deviceSelect">Device Model</label>
-            <select id="deviceSelect">
-                <option value="">-- Select Device --</option>
-            </select>
-        </div>
+        <hr>
 
-        <div class="selector">
-            <label for="versionSelect">Firmware Version</label>
-            <select id="versionSelect" disabled>
-                <option value="">Select a device first</option>
-            </select>
-        </div>
+        <section>
+            <h2>📡 MESH NETIQUETTE</h2>
+            <p>
+                Per un utilizzo responsabile e rispettoso della rete mesh, consulta le linee guida della community.
+            </p>
+            <a href="netiquette.html" class="btn">Leggi la Netiquette</a>
+        </section>
 
-        <div class="download-section">
-            <div class="loading" id="loadingMsg">Select a device and version to see available downloads</div>
-            <div class="no-files" id="noFilesMsg">No firmware files found for this combination</div>
-            <div class="file-list" id="fileList"></div>
-        </div>
+        <section>
+            <h2>🛠️ MESH ROLES</h2>
+            <p>
+                Scopri come configurare correttamente i nodi della rete mesh per ottimizzare le prestazioni e ridurre il flooding.
+            </p>
+            <a href="roles.html" class="btn">Configurazione Ruoli</a>
+        </section>
+
+        <hr>
+
+        <section>
+            <h3>🌑 DARKMESH</h3>
+            <p>
+                Fork di Meshtastic focalizzato su <strong>messaggi programmati, affidabilità e inoltro metadata</strong>.
+            </p>
+
+            <h4>Android - Funzionalità</h4>
+            <ul>
+                <li><strong>Hunting Mode</strong>: imposta un channel primario senza encryption per agevolare ricerca e messaggi broadcast verso pubblico generico</li>
+                <li><strong>Messaggi Programmati</strong>: pianifica invio messaggi con data/ora</li>
+                <li><strong>Beaconing</strong>: genera automaticamente messaggi beacon per tracciamento nodi</li>
+                <li><strong>Gateway Detection</strong>: rileva nodi gateway nella rete</li>
+                <li><strong>Messaggi in Coda</strong>: gestisce messaggi pendenti e retry automatici</li>
+                <li><strong>Compressione Messaggi</strong>: riduce dimensione pacchetti per maggiore efficienza</li>
+                <li><strong>Database Nodi</strong>: salva e gestisce informazioni sui nodi rilevati</li>
+                <li><strong>Statistiche Avanzate</strong>: analisi dettagliate traffico e prestazioni</li>
+                <li><strong>UI Migliorata</strong>: interfaccia ottimizzata per uso su campo</li>
+            </ul>
+
+            <h4>Firmware - Patches</h4>
+            <ul>
+                <li><strong>Sleep Recovery</strong>: migliora la sincronizzazione dopo sleep mode</li>
+                <li><strong>Auto Zero Cost Hop</strong>: ottimizza routing evitando hop inutili</li>
+                <li><strong>Console Module</strong>: modulo debug avanzato</li>
+                <li><strong>Metadata Forwarding</strong>: inoltro informazioni metadata tra nodi</li>
+                <li><strong>Fixed Position Override</strong>: permette override posizione fissa da client</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>💾 Repository</h2>
+            <p>
+                <a href="https://github.com/TommasoLencioni/DarkMesh-Firmware" class="btn">📦 Firmware GitHub</a>
+                <a href="https://github.com/emp3r0r7/DarkMesh-Android" class="btn">📱 Android GitHub</a>
+            </p>
+        </section>
+
+        <section>
+            <h2>📥 Download Firmware</h2>
+            <p>
+                Scarica i firmware precompilati per i dispositivi supportati.
+            </p>
+            <a href="downloads.html" class="btn">⬇️ Download Firmware</a>
+        </section>
+
+        <section>
+            <h2>💬 Telegram Channel</h2>
+            <p>
+                Unisciti alla community DarkMesh su Telegram per discussioni, aggiornamenti e supporto tra utenti.
+            </p>
+            <a href="https://t.me/darkmesh_lora" class="btn">📱 Unisciti al Canale</a>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>📻 LoRa Channels</h2>
+            <p>Configurazioni canali LoRa per la community DarkMesh:</p>
+
+            <div class="channel-block">
+                <strong>CANALE PRINCIPALE (PRIMARY)</strong><br>
+                Nome: DarkMesh<br>
+                PSK: AQ=<br>
+                Frequenza: Default EU868<br>
+                Ruolo: PRIMARY
+            </div>
+
+            <div class="channel-block">
+                <strong>CANALE SECONDARIO</strong><br>
+                Nome: DarkMeshSec<br>
+                PSK: 1PG7OiApB1nwvP+rz05pAQ==<br>
+                Frequenza: Default EU868<br>
+                Ruolo: SECONDARY
+            </div>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>🗄️ Risorse</h2>
+            <ul>
+                <li><a href="radios.html">📻 Radio LoRa Testate</a></li>
+                <li><a href="antennas.html">📡 Antenne Recensite</a></li>
+                <li><strong>Database Nodi LAZIO</strong>: <a href="nodes_database/fav_LAZIO_ROUTER_28-02-2026.dmdb">Download .dmdb</a></li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>☕ Supporta il Progetto</h2>
+            <p>
+                Se DarkMesh ti è utile, considera una donazione per supportare lo sviluppo.
+            </p>
+            <a href="https://ko-fi.com/darkmesh" class="btn">☕ Donazione Ko-fi</a>
+        </section>
+
+        <footer>
+            <p>DarkMesh 2026 — Chris</p>
+        </footer>
     </div>
-
-    <script>
-        const REPO_OWNER = 'TommasoLencioni';
-        const REPO_NAME = 'DarkMesh-Firmware';
-        const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases`;
-
-        let releases = [];
-        let currentDevice = null;
-        let currentRelease = null;
-        let availableDevices = new Set();
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadReleases();
-            extractAvailableDevices();
-            populateDeviceSelect();
-            setupEventListeners();
-        });
-
-        async function loadReleases() {
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Failed to fetch releases');
-
-                releases = await response.json();
-
-                if (releases.length === 0) {
-                    showError('No releases found. Please create a release first.');
-                    return;
-                }
-            } catch (error) {
-                showError(`Error loading releases: ${error.message}`);
-            }
-        }
-
-        function extractAvailableDevices() {
-            // Scan all releases and extract device names from zip filenames
-            releases.forEach(release => {
-                release.assets.forEach(asset => {
-                    // Match pattern: devicename-version.zip
-                    const match = asset.name.match(/^(.+?)-\d+\.\d+\.\d+\..+\.zip$/);
-                    if (match) {
-                        availableDevices.add(match[1]);
-                    }
-                });
-            });
-        }
-
-        function formatDeviceName(deviceKey) {
-            // Convert device key to human-readable name
-            return deviceKey
-                .split('-')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-        }
-
-        function populateDeviceSelect() {
-            const select = document.getElementById('deviceSelect');
-            select.innerHTML = '<option value="">-- Select Device --</option>';
-
-            // Sort devices alphabetically
-            const sortedDevices = Array.from(availableDevices).sort();
-
-            sortedDevices.forEach(device => {
-                const option = document.createElement('option');
-                option.value = device;
-                option.textContent = formatDeviceName(device);
-                select.appendChild(option);
-            });
-
-            if (sortedDevices.length === 0) {
-                select.innerHTML = '<option value="">No devices found</option>';
-                select.disabled = true;
-            }
-        }
-
-        function setupEventListeners() {
-            document.getElementById('deviceSelect').addEventListener('change', onDeviceChange);
-            document.getElementById('versionSelect').addEventListener('change', onVersionChange);
-        }
-
-        function onDeviceChange(e) {
-            currentDevice = e.target.value;
-            const versionSelect = document.getElementById('versionSelect');
-
-            if (!currentDevice) {
-                versionSelect.disabled = true;
-                versionSelect.innerHTML = '<option value="">Select a device first</option>';
-                hideFiles();
-                return;
-            }
-
-            populateVersionsForDevice(currentDevice);
-            versionSelect.disabled = false;
-        }
-
-        function populateVersionsForDevice(device) {
-            const select = document.getElementById('versionSelect');
-            select.innerHTML = '<option value="">-- Select Version --</option>';
-
-            // Filter releases that have assets for this device
-            const releasesWithDevice = releases.filter(release =>
-                release.assets.some(asset => asset.name.includes(device))
-            );
-
-            if (releasesWithDevice.length === 0) {
-                select.innerHTML = '<option value="">No releases available for this device</option>';
-                select.disabled = true;
-                hideFiles();
-                return;
-            }
-
-            releasesWithDevice.forEach((release, index) => {
-                const option = document.createElement('option');
-                option.value = releases.indexOf(release); // Use original index
-                option.textContent = release.name || release.tag_name;
-                if (release.prerelease) option.textContent += ' (Pre-release)';
-                select.appendChild(option);
-            });
-        }
-
-        function onVersionChange(e) {
-            const index = e.target.value;
-
-            if (!index || !currentDevice) {
-                hideFiles();
-                return;
-            }
-
-            currentRelease = releases[index];
-            displayFiles(currentDevice);
-        }
-
-        function displayFiles(device) {
-            const fileList = document.getElementById('fileList');
-            const noFilesMsg = document.getElementById('noFilesMsg');
-            const loadingMsg = document.getElementById('loadingMsg');
-
-            // Find matching asset
-            const assets = currentRelease.assets.filter(asset =>
-                asset.name.includes(device)
-            );
-
-            loadingMsg.style.display = 'none';
-
-            if (assets.length === 0) {
-                fileList.classList.remove('visible');
-                noFilesMsg.classList.add('visible');
-                return;
-            }
-
-            noFilesMsg.classList.remove('visible');
-            fileList.innerHTML = '';
-
-            assets.forEach(asset => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-
-                const fileName = document.createElement('div');
-                fileName.className = 'file-name';
-                fileName.textContent = asset.name;
-
-                const downloadLink = document.createElement('a');
-                downloadLink.href = asset.browser_download_url;
-                downloadLink.className = 'download-btn';
-                downloadLink.textContent = 'Download';
-                downloadLink.download = asset.name;
-
-                fileItem.appendChild(fileName);
-                fileItem.appendChild(downloadLink);
-                fileList.appendChild(fileItem);
-            });
-
-            fileList.classList.add('visible');
-        }
-
-        function hideFiles() {
-            document.getElementById('fileList').classList.remove('visible');
-            document.getElementById('noFilesMsg').classList.remove('visible');
-            document.getElementById('loadingMsg').style.display = 'block';
-        }
-
-        function showError(message) {
-            const errorBox = document.getElementById('errorBox');
-            errorBox.textContent = message;
-            errorBox.classList.add('visible');
-        }
-    </script>
 </body>
 </html>

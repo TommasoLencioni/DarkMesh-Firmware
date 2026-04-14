@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkMesh - Mesh Roles</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Torna alla Home</a>
+
+        <header>
+            <h1>MESH ROLES</h1>
+            <p>Configurazione dei ruoli dei dispositivi nella rete mesh</p>
+        </header>
+
+        <div class="warning">
+            <strong>⚠️ Problema Comune</strong><br>
+            Una mesh non gestita con tutti i nodi in configurazione predefinita porta a <strong>flooding incontrollato</strong>:
+            copie multiple dello stesso pacchetto, collisioni sul canale radio, perdita di messaggi e latenza crescente.
+        </div>
+
+        <section>
+            <h2>Benefici della Configurazione Corretta</h2>
+            <ul>
+                <li>✅ Eliminazione ritrasmissioni non necessarie</li>
+                <li>✅ Riduzione interferenze sul canale radio</li>
+                <li>✅ Maggiore affidabilità in aree ad alta densità</li>
+                <li>✅ Estensione durata batteria per dispositivi mobili</li>
+                <li>✅ Creazione di infrastruttura backbone stabile</li>
+            </ul>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>🔇 CLIENT_MUTE</h2>
+            <p><strong>Ruolo ideale per:</strong> dispositivi mobili, smartphone, tracker personali</p>
+
+            <h3>Comportamento</h3>
+            <p>
+                I nodi <code>CLIENT_MUTE</code> ricevono e inviano messaggi ma <strong>non ritrasmettono traffico</strong>
+                proveniente da altri dispositivi.
+            </p>
+
+            <h3>Vantaggi</h3>
+            <ul>
+                <li>Conserva batteria (nessun relay di pacchetti altrui)</li>
+                <li>Evita ritrasmissioni ridondanti da endpoint in movimento</li>
+                <li>Riduce congestione di rete in scenari urbani densi</li>
+            </ul>
+
+            <h3>Quando Usarlo</h3>
+            <p>
+                Dispositivi che si muovono frequentemente (smartphone, zaini, veicoli) o con alimentazione limitata.
+                Se il tuo nodo non ha una posizione fissa e stabile, usa <code>CLIENT_MUTE</code>.
+            </p>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>📡 CLIENT_BASE</h2>
+            <p><strong>Ruolo ideale per:</strong> installazioni fisse, tetti, balconi, finestre alte</p>
+
+            <h3>Comportamento</h3>
+            <p>
+                I nodi <code>CLIENT_BASE</code> inoltrano attivamente i pacchetti e supportano la funzionalità
+                <strong>"zero cost hop"</strong>: i messaggi possono attraversare la rete preservando capacità
+                di propagazione senza incrementare il limite di hop configurati.
+            </p>
+
+            <h3>Vantaggi</h3>
+            <ul>
+                <li>Estende copertura geografica della mesh</li>
+                <li>Crea backbone affidabile per routing</li>
+                <li>Ottimizza percorsi multi-hop</li>
+                <li>Abilita zero-cost hop per efficienza</li>
+            </ul>
+
+            <h3>Quando Usarlo</h3>
+            <p>
+                Installazioni permanenti con buona visibilità, alimentazione stabile (AC o pannello solare),
+                antenna esterna. Questi nodi fungono da "pilastri" della mesh locale.
+            </p>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>💡 Principio Chiave</h2>
+            <div class="info-box">
+                <strong>"Una mesh efficiente non deriva dalla quantità di nodi, ma dalla qualità della loro configurazione."</strong>
+            </div>
+            <p>
+                Pochi nodi <code>CLIENT_BASE</code> ben posizionati + molti <code>CLIENT_MUTE</code> mobili =
+                rete stabile, efficiente e scalabile.
+            </p>
+        </section>
+
+        <footer>
+            <p>DarkMesh 2026 — Chris</p>
+        </footer>
+    </div>
+</body>
+</html>
